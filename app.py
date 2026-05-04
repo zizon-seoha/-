@@ -45,6 +45,17 @@ ITEMS_BY_LEVEL = {
 }
 MAX_LEVEL = max(ITEMS_BY_LEVEL)
 
+MATERIAL_REQUIREMENTS = {
+    13: {12: 1},
+    14: {13: 1, 12: 1},
+    15: {14: 1},
+    16: {15: 1, 14: 2, 13: 2},
+    17: {16: 2},
+    18: {17: 1, 16: 1},
+    19: {18: 2},
+    20: {19: 3},
+}
+
 
 def success_rate(level: int) -> int:
     rates = [
@@ -133,6 +144,54 @@ def item_for_level(level: int) -> dict[str, str]:
     return ITEMS_BY_LEVEL[fallback_level]
 
 
+def material_count(level: int) -> int:
+    return int(st.session_state.materials.get(level, 0))
+
+
+def material_name(level: int) -> str:
+    return item_for_level(level)["name"]
+
+
+def material_requirement_text(requirements: dict[int, int]) -> str:
+    return ", ".join(
+        f"+{level} {material_name(level)} x{quantity}"
+        for level, quantity in sorted(requirements.items(), reverse=True)
+    )
+
+
+def missing_materials(target_level: int, current_level: int) -> dict[int, int]:
+    missing = {}
+    for material_level, required_quantity in MATERIAL_REQUIREMENTS.get(target_level, {}).items():
+        available_quantity = material_count(material_level)
+        if current_level == material_level:
+            available_quantity += 1
+
+        if available_quantity < required_quantity:
+            missing[material_level] = required_quantity - available_quantity
+
+    return missing
+
+
+def consume_extra_materials(target_level: int, current_level: int) -> None:
+    materials = st.session_state.materials
+    for material_level, required_quantity in MATERIAL_REQUIREMENTS.get(target_level, {}).items():
+        extra_quantity = required_quantity - (1 if current_level == material_level else 0)
+        if extra_quantity <= 0:
+            continue
+
+        materials[material_level] = max(0, material_count(material_level) - extra_quantity)
+
+
+def stored_material_summary(min_level: int = 12) -> str:
+    rows = []
+    for level in range(min_level, MAX_LEVEL + 1):
+        count = material_count(level)
+        if count > 0:
+            rows.append(f"+{level} {html.escape(material_name(level))}: {count}개")
+
+    return "<br>".join(rows) if rows else "보관 중인 재료 검이 없습니다."
+
+
 def init_state() -> None:
     defaults = {
         "level": 0,
@@ -142,6 +201,7 @@ def init_state() -> None:
         "history": [],
         "panel": "",
         "auto_protect": AUTO_USE_PROTECTION_SCROLL,
+        "materials": {},
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
@@ -154,9 +214,17 @@ def push_history(message: str) -> None:
 
 def enhance_item() -> None:
     level = st.session_state.level
+    target_level = level + 1
 
     if level >= MAX_LEVEL:
         message = f"이미 최대 강화 단계 +{MAX_LEVEL}입니다."
+        st.session_state.last_message = message
+        push_history(message)
+        return
+
+    missing = missing_materials(target_level, level)
+    if missing:
+        message = f"+{target_level} 강화 재료 부족: {material_requirement_text(missing)}"
         st.session_state.last_message = message
         push_history(message)
         return
@@ -169,12 +237,13 @@ def enhance_item() -> None:
         return
 
     st.session_state.money -= cost
+    consume_extra_materials(target_level, level)
     rate = success_rate(level)
     roll = random.randint(1, 100)
 
     if roll <= rate:
-        st.session_state.level += 1
-        message = f"강화 성공! +{level}에서 +{level + 1}이 되었습니다."
+        st.session_state.level = target_level
+        message = f"강화 성공! +{level}에서 +{target_level}이 되었습니다."
     else:
         penalty = failure_penalty(level)
         use_protection = (
@@ -211,6 +280,19 @@ def sell_item(item_name: str) -> None:
     push_history(message)
 
 
+def store_current_item(item_name: str) -> None:
+    level = st.session_state.level
+    if level <= 0:
+        message = "+1 이상 아이템부터 재료로 보관할 수 있습니다."
+    else:
+        st.session_state.materials[level] = material_count(level) + 1
+        st.session_state.level = 0
+        message = f"+{level} {item_name}을 재료로 보관했습니다."
+
+    st.session_state.last_message = message
+    push_history(message)
+
+
 def buy_protection_scroll(quantity: int) -> None:
     quantity = max(1, quantity)
     total_price = PROTECTION_SCROLL_PRICE * quantity
@@ -234,6 +316,7 @@ def reset_game() -> None:
     st.session_state.level = 0
     st.session_state.money = STARTING_MONEY
     st.session_state.protection_scrolls = 0
+    st.session_state.materials = {}
     st.session_state.last_message = "새 게임을 시작했습니다."
     st.session_state.history = []
     st.session_state.panel = ""
@@ -681,15 +764,21 @@ def render_panel(item_name: str) -> None:
 <div class="info-panel">
   보유 아이템: +{st.session_state.level} {html.escape(item_name)}<br>
   판매가격: {format_won(sale_price(st.session_state.level))}<br>
-  방지권: {st.session_state.protection_scrolls}장
+  방지권: {st.session_state.protection_scrolls}장<br><br>
+  재료 보관함<br>
+  {stored_material_summary()}
 </div>
             """
         )
 
-        left, right = st.columns(2)
+        left, center, right = st.columns(3)
         with left:
             if st.button("판매하기", use_container_width=True):
                 sell_item(item_name)
+                st.rerun()
+        with center:
+            if st.button("재료로 보관", use_container_width=True):
+                store_current_item(item_name)
                 st.rerun()
         with right:
             if st.button("새로 시작", use_container_width=True):
