@@ -83,8 +83,11 @@ def sale_price(level: int) -> int:
         return 0
 
     custom_prices = {
-        16: 6_000_000,
-        17: 10_000_000,
+        15: 2_000_000,
+        16: 3_500_000,
+        17: 4_500_000,
+        18: 6_000_000,
+        19: 10_000_000,
     }
     if level in custom_prices:
         return custom_prices[level]
