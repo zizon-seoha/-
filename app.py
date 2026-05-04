@@ -303,8 +303,16 @@ def render_css() -> None:
         }
 
         .stats-row {
+            display: none;
             margin-top: 52px;
             text-align: center;
+        }
+
+        .main-row {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 0.9fr 2fr 0.35fr;
+            margin-top: 18px;
         }
 
         .left-stats {
@@ -515,12 +523,22 @@ def render_css() -> None:
             }
 
             .stats-row {
+                display: block;
                 margin-top: 48px;
+            }
+
+            .main-row {
+                grid-template-columns: 1fr;
+                margin-top: 18px;
             }
 
             .left-stats {
                 font-size: 24px;
                 text-align: center;
+            }
+
+            .desktop-stats {
+                display: none;
             }
 
             div[data-testid="stElementContainer"]:has(div[data-testid="stCheckbox"]) {
@@ -613,9 +631,16 @@ def render_board_bottom(item_name: str, image_data_uri: str) -> None:
     st.html(
         f"""
 <div class="game-board game-board-bottom">
-  <div class="item-area">
-    {image_html}
-    <div class="item-name">+{level} {escaped_name}</div>
+  <div class="main-row">
+    <div class="left-stats desktop-stats">
+      강화비용:{format_won(enhancement_cost(level))}<br>
+      판매가격:{format_won(sale_price(level))}
+    </div>
+    <div class="item-area">
+      {image_html}
+      <div class="item-name">+{level} {escaped_name}</div>
+    </div>
+    <div class="right-space"></div>
   </div>
   <div class="bottom-row">
     <div class="bottom-left">
