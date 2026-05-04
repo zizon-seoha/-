@@ -277,17 +277,20 @@ def render_css() -> None:
         }
 
         .title-wrap {
+            max-width: 100%;
             position: relative;
             text-align: center;
         }
 
         .game-title {
             color: #d40000;
-            font-size: 72px;
+            font-size: 56px;
             font-weight: 900;
             letter-spacing: 0;
             line-height: 1;
             margin: 10px 0 0;
+            max-width: 100%;
+            overflow-wrap: normal;
             text-shadow: 4px 5px 0 #050505;
             white-space: nowrap;
         }
@@ -515,7 +518,8 @@ def render_css() -> None:
             }
 
             .game-title {
-                font-size: 48px;
+                font-size: 34px;
+                text-shadow: 3px 4px 0 #050505;
             }
 
             .difficulty {
