@@ -327,11 +327,14 @@ def render_css() -> None:
 
         div[data-testid="stElementContainer"]:has(div[data-testid="stCheckbox"]) {
             background: #ffffff;
-            border-left: 3px solid #1d1d1d;
-            border-right: 3px solid #1d1d1d;
+            border-radius: 4px;
+            left: 70px !important;
             margin-top: 0 !important;
-            padding: 0 34px 8px;
-            width: 100% !important;
+            padding: 2px 6px;
+            position: absolute !important;
+            top: 385px !important;
+            width: max-content !important;
+            z-index: 30;
         }
 
         div[data-testid="stCheckbox"] {
@@ -521,7 +524,13 @@ def render_css() -> None:
             }
 
             div[data-testid="stElementContainer"]:has(div[data-testid="stCheckbox"]) {
+                border-left: 3px solid #1d1d1d;
+                border-radius: 0;
+                border-right: 3px solid #1d1d1d;
+                left: auto !important;
                 padding: 0 16px 8px;
+                position: static !important;
+                top: auto !important;
                 width: 100% !important;
             }
 
