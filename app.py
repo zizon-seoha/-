@@ -288,7 +288,7 @@ def render_css() -> None:
             font-size: 72px;
             font-weight: 900;
             letter-spacing: 0;
-            line-height: 1.8;
+            line-height: 2.4;
             margin: 10px 0 0;
             max-width: 100%;
             overflow-wrap: normal;
