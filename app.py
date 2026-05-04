@@ -94,11 +94,11 @@ def sale_price(level: int) -> int:
         return 0
 
     custom_prices = {
-        15: 2_000_000,
-        16: 3_500_000,
-        17: 4_500_000,
-        18: 6_000_000,
-        19: 10_000_000,
+        15: 4_000_000,
+        16: 5_800_000,
+        17: 7_800_000,
+        18: 10_000_000,
+        19: 22_000_000,
     }
     if level in custom_prices:
         return custom_prices[level]
@@ -159,12 +159,10 @@ def material_requirement_text(requirements: dict[int, int]) -> str:
     )
 
 
-def missing_materials(target_level: int, current_level: int) -> dict[int, int]:
+def missing_materials(target_level: int) -> dict[int, int]:
     missing = {}
     for material_level, required_quantity in MATERIAL_REQUIREMENTS.get(target_level, {}).items():
         available_quantity = material_count(material_level)
-        if current_level == material_level:
-            available_quantity += 1
 
         if available_quantity < required_quantity:
             missing[material_level] = required_quantity - available_quantity
@@ -172,14 +170,10 @@ def missing_materials(target_level: int, current_level: int) -> dict[int, int]:
     return missing
 
 
-def consume_extra_materials(target_level: int, current_level: int) -> None:
+def consume_materials(target_level: int) -> None:
     materials = st.session_state.materials
     for material_level, required_quantity in MATERIAL_REQUIREMENTS.get(target_level, {}).items():
-        extra_quantity = required_quantity - (1 if current_level == material_level else 0)
-        if extra_quantity <= 0:
-            continue
-
-        materials[material_level] = max(0, material_count(material_level) - extra_quantity)
+        materials[material_level] = max(0, material_count(material_level) - required_quantity)
 
 
 def stored_material_summary(min_level: int = 12) -> str:
@@ -222,7 +216,7 @@ def enhance_item() -> None:
         push_history(message)
         return
 
-    missing = missing_materials(target_level, level)
+    missing = missing_materials(target_level)
     if missing:
         message = f"+{target_level} 강화 재료 부족: {material_requirement_text(missing)}"
         st.session_state.last_message = message
@@ -237,7 +231,7 @@ def enhance_item() -> None:
         return
 
     st.session_state.money -= cost
-    consume_extra_materials(target_level, level)
+    consume_materials(target_level)
     rate = success_rate(level)
     roll = random.randint(1, 100)
 
