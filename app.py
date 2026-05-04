@@ -288,7 +288,7 @@ def render_css() -> None:
             font-size: 72px;
             font-weight: 900;
             letter-spacing: 0;
-            line-height: 1.18;
+            line-height: 1.3;
             margin: 10px 0 0;
             max-width: 100%;
             overflow-wrap: normal;
@@ -520,7 +520,7 @@ def render_css() -> None:
 
             .game-title {
                 font-size: 48px;
-                line-height: 1.2;
+                line-height: 1.0;
                 text-shadow: 3px 4px 0 #050505;
             }
 
