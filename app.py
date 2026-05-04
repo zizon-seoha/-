@@ -136,9 +136,8 @@ def destruction_chance(level: int) -> int:
 
 def destruction_chance_text(level: int) -> str:
     chance = destruction_chance(level)
-    if chance <= 0:
-        return "파괴 확률 0%"
-    return f"{chance}% 확률로 파괴"
+    keep_chance = 100 - chance
+    return f"{keep_chance}%로 보존 {chance}%로 파괴"
 
 
 def format_won(value: int) -> str:
