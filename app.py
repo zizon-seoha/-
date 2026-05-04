@@ -46,7 +46,6 @@ ITEMS_BY_LEVEL = {
 MAX_LEVEL = max(ITEMS_BY_LEVEL)
 
 MATERIAL_REQUIREMENTS = {
-    13: {12: 1},
     14: {13: 1, 12: 1},
     15: {14: 1},
     16: {15: 1, 14: 2, 13: 2},
