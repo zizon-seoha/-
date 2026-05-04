@@ -309,20 +309,25 @@ def render_css() -> None:
         }
 
         div[data-testid="stCheckbox"] {
-            left: 64px;
-            position: absolute;
-            top: 258px;
-            width: 280px;
+            background: #ffffff;
+            border-radius: 4px;
+            left: 64px !important;
+            padding: 2px 6px;
+            position: absolute !important;
+            top: 258px !important;
+            width: max-content !important;
             z-index: 20;
         }
 
         div[data-testid="stCheckbox"] label {
             align-items: center;
             color: #050505;
+            display: flex;
             font-family: Arial, "Malgun Gothic", sans-serif;
             font-size: 20px;
             font-weight: 900;
             gap: 8px;
+            white-space: nowrap;
         }
 
         div[data-testid="stCheckbox"] p {
@@ -487,10 +492,11 @@ def render_css() -> None:
             }
 
             div[data-testid="stCheckbox"] {
-                left: 50%;
-                top: 270px;
+                left: 50% !important;
+                max-width: calc(100vw - 96px);
+                top: 252px !important;
                 transform: translateX(-50%);
-                width: 220px;
+                width: max-content !important;
             }
 
             div[data-testid="stCheckbox"] p {
