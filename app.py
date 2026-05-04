@@ -261,13 +261,11 @@ def render_css() -> None:
 
         .game-board-top {
             border-bottom: 0;
-            box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px #1d1d1d;
             padding-bottom: 6px;
         }
 
         .game-board-bottom {
             border-top: 0;
-            box-shadow: 0 2px 0 2px #ffffff, 0 5px 0 5px #1d1d1d;
             min-height: 500px;
             padding-top: 6px;
         }
@@ -331,7 +329,7 @@ def render_css() -> None:
             background: #ffffff;
             border-left: 3px solid #1d1d1d;
             border-right: 3px solid #1d1d1d;
-            box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px #1d1d1d;
+            margin-top: 0 !important;
             padding: 0 34px 8px;
             width: 100% !important;
         }
