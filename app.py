@@ -254,11 +254,22 @@ def render_css() -> None:
         .game-board {
             background: #ffffff;
             border: 3px solid #1d1d1d;
-            box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px #1d1d1d;
             color: #050505;
             font-family: Arial, "Malgun Gothic", sans-serif;
-            min-height: 690px;
             padding: 10px 34px 24px;
+        }
+
+        .game-board-top {
+            border-bottom: 0;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px #1d1d1d;
+            padding-bottom: 6px;
+        }
+
+        .game-board-bottom {
+            border-top: 0;
+            box-shadow: 0 2px 0 2px #ffffff, 0 5px 0 5px #1d1d1d;
+            min-height: 500px;
+            padding-top: 6px;
         }
 
         .top-row {
@@ -293,11 +304,9 @@ def render_css() -> None:
             top: 104px;
         }
 
-        .main-row {
-            display: grid;
-            gap: 20px;
-            grid-template-columns: 0.9fr 2fr 0.35fr;
-            margin-top: 24px;
+        .stats-row {
+            margin-top: 52px;
+            text-align: center;
         }
 
         .left-stats {
@@ -308,12 +317,23 @@ def render_css() -> None:
             white-space: nowrap;
         }
 
+        div[data-testid="stElementContainer"]:has(.game-board-top),
+        div[data-testid="stElementContainer"]:has(.game-board-bottom),
         div[data-testid="stElementContainer"]:has(div[data-testid="stCheckbox"]) {
-            left: 64px !important;
-            position: absolute !important;
-            top: 258px !important;
-            width: max-content !important;
-            z-index: 20;
+            margin-bottom: 0 !important;
+        }
+
+        div[data-testid="stVerticalBlock"]:has(.game-board-top) {
+            gap: 0 !important;
+        }
+
+        div[data-testid="stElementContainer"]:has(div[data-testid="stCheckbox"]) {
+            background: #ffffff;
+            border-left: 3px solid #1d1d1d;
+            border-right: 3px solid #1d1d1d;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px #1d1d1d;
+            padding: 0 34px 8px;
+            width: 100% !important;
         }
 
         div[data-testid="stCheckbox"] {
@@ -468,8 +488,16 @@ def render_css() -> None:
 
         @media (max-width: 760px) {
             .game-board {
-                min-height: 620px;
                 padding: 10px 16px 20px;
+            }
+
+            .game-board-top {
+                padding-bottom: 4px;
+            }
+
+            .game-board-bottom {
+                min-height: 470px;
+                padding-top: 4px;
             }
 
             .top-row {
@@ -485,9 +513,8 @@ def render_css() -> None:
                 display: none;
             }
 
-            .main-row {
-                grid-template-columns: 1fr;
-                margin-top: 18px;
+            .stats-row {
+                margin-top: 48px;
             }
 
             .left-stats {
@@ -496,10 +523,8 @@ def render_css() -> None:
             }
 
             div[data-testid="stElementContainer"]:has(div[data-testid="stCheckbox"]) {
-                left: 50% !important;
-                top: 270px !important;
-                transform: translateX(-50%);
-                width: max-content !important;
+                padding: 0 16px 8px;
+                width: 100% !important;
             }
 
             div[data-testid="stCheckbox"] p {
@@ -542,10 +567,33 @@ def render_css() -> None:
     )
 
 
-def render_board(item_name: str, image_data_uri: str) -> None:
+def render_board_top() -> None:
     level = st.session_state.level
     escaped_title = html.escape(GAME_TITLE)
     escaped_difficulty = html.escape(DIFFICULTY)
+
+    st.html(
+        f"""
+<div class="game-board game-board-top">
+  <div class="top-row">
+    <div class="title-wrap">
+      <div class="game-title">{escaped_title}</div>
+      <div class="difficulty">{escaped_difficulty}</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="left-stats">
+      강화비용:{format_won(enhancement_cost(level))}<br>
+      판매가격:{format_won(sale_price(level))}
+    </div>
+  </div>
+</div>
+        """
+    )
+
+
+def render_board_bottom(item_name: str, image_data_uri: str) -> None:
+    level = st.session_state.level
     escaped_name = html.escape(item_name)
     escaped_message = html.escape(st.session_state.last_message)
 
@@ -557,23 +605,10 @@ def render_board(item_name: str, image_data_uri: str) -> None:
 
     st.html(
         f"""
-<div class="game-board">
-  <div class="top-row">
-    <div class="title-wrap">
-      <div class="game-title">{escaped_title}</div>
-      <div class="difficulty">{escaped_difficulty}</div>
-    </div>
-  </div>
-  <div class="main-row">
-    <div class="left-stats">
-      강화비용:{format_won(enhancement_cost(level))}<br>
-      판매가격:{format_won(sale_price(level))}
-    </div>
-    <div class="item-area">
-      {image_html}
-      <div class="item-name">+{level} {escaped_name}</div>
-    </div>
-    <div class="right-space"></div>
+<div class="game-board game-board-bottom">
+  <div class="item-area">
+    {image_html}
+    <div class="item-name">+{level} {escaped_name}</div>
   </div>
   <div class="bottom-row">
     <div class="bottom-left">
@@ -657,13 +692,15 @@ def main() -> None:
     if not image_data_uri:
         image_data_uri = image_to_data_uri(DEFAULT_ITEM_IMAGE)
 
+    render_board_top()
+
     st.checkbox(
         f"방지권 사용 ({st.session_state.protection_scrolls}장)",
         key="auto_protect",
         help="실패 시 하락 또는 파괴가 발생할 때 방지권을 1장 사용합니다.",
     )
 
-    render_board(current_item["name"], image_data_uri)
+    render_board_bottom(current_item["name"], image_data_uri)
 
     nav_left, nav_center, nav_right = st.columns([1, 1.25, 1])
     with nav_left:
