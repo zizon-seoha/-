@@ -273,6 +273,7 @@ def render_css() -> None:
         .top-row {
             align-items: start;
             display: flex;
+            min-height: 118px;
             justify-content: center;
         }
 
@@ -284,10 +285,10 @@ def render_css() -> None:
 
         .game-title {
             color: #d40000;
-            font-size: 56px;
+            font-size: 72px;
             font-weight: 900;
             letter-spacing: 0;
-            line-height: 1;
+            line-height: 1.18;
             margin: 10px 0 0;
             max-width: 100%;
             overflow-wrap: normal;
@@ -518,7 +519,8 @@ def render_css() -> None:
             }
 
             .game-title {
-                font-size: 34px;
+                font-size: 48px;
+                line-height: 1.2;
                 text-shadow: 3px 4px 0 #050505;
             }
 
