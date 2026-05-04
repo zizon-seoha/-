@@ -514,13 +514,17 @@ def render_css() -> None:
             }
 
             .top-row {
+                align-items: flex-start;
                 display: flex;
+                min-height: 118px;
+                padding-top: 28px;
                 text-align: center;
             }
 
             .game-title {
                 font-size: 48px;
-                line-height: 1.0;
+                line-height: 1.25;
+                margin: 0;
                 text-shadow: 3px 4px 0 #050505;
             }
 
@@ -530,7 +534,7 @@ def render_css() -> None:
 
             .stats-row {
                 display: block;
-                margin-top: 48px;
+                margin-top: 14px;
             }
 
             .main-row {
