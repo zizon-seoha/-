@@ -12,7 +12,7 @@ import streamlit as st
 APP_DIR = Path(__file__).parent
 GAME_TITLE = "닥쳐씹련아 강화하기"
 DIFFICULTY = "easy"
-STARTING_MONEY = 10_000_000
+STARTING_MONEY = 2_000_000
 PROTECTION_SCROLL_PRICE = 50_000
 AUTO_USE_PROTECTION_SCROLL = False
 
