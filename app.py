@@ -54,6 +54,16 @@ MATERIAL_REQUIREMENTS = {
     20: {19: 3},
 }
 
+DESTRUCTION_CHANCE_BY_LEVEL = {
+    10: 10,
+    11: 15,
+    12: 25,
+    13: 35,
+    14: 48,
+    15: 58,
+    16: 70,
+}
+
 
 def success_rate(level: int) -> int:
     rates = [
@@ -115,7 +125,20 @@ def failure_penalty(level: int) -> str:
         return "keep"
     if level < 10:
         return "down"
-    return "break"
+    return "break" if random.randint(1, 100) <= destruction_chance(level) else "down"
+
+
+def destruction_chance(level: int) -> int:
+    if level < 10:
+        return 0
+    return DESTRUCTION_CHANCE_BY_LEVEL.get(level, 100)
+
+
+def destruction_chance_text(level: int) -> str:
+    chance = destruction_chance(level)
+    if chance <= 0:
+        return "파괴 확률 0%"
+    return f"{chance}% 확률로 파괴"
 
 
 def format_won(value: int) -> str:
@@ -511,7 +534,18 @@ def render_css() -> None:
         }
 
         .bottom-center {
+            align-items: baseline;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
             text-align: center;
+        }
+
+        .break-rate {
+            color: #d60000;
+            font-size: 24px;
+            white-space: nowrap;
         }
 
         .bottom-right {
@@ -673,6 +707,14 @@ def render_css() -> None:
                 font-size: 24px;
                 text-align: center;
             }
+
+            .bottom-center {
+                gap: 8px;
+            }
+
+            .break-rate {
+                font-size: 20px;
+            }
         }
         </style>
         """,
@@ -736,7 +778,8 @@ def render_board_bottom(item_name: str, image_data_uri: str) -> None:
       돈:
     </div>
     <div class="bottom-center">
-      성공률 {success_rate(level)} %
+      <span>성공률 {success_rate(level)} %</span>
+      <span class="break-rate">{destruction_chance_text(level)}</span>
     </div>
     <div class="bottom-right">
       <div class="made-by">by NBS style</div>
