@@ -251,11 +251,11 @@ def enhance_item() -> None:
         return
 
     st.session_state.money -= cost
-    consume_materials(target_level)
     rate = success_rate(level)
     roll = random.randint(1, 100)
 
     if roll <= rate:
+        consume_materials(target_level)
         st.session_state.level = target_level
         message = f"강화 성공! +{level}에서 +{target_level}이 되었습니다."
     else:
@@ -278,6 +278,7 @@ def enhance_item() -> None:
             st.session_state.level = max(0, level - 1)
             message = f"강화 실패! +{level}에서 +{st.session_state.level}로 내려갔습니다."
         else:
+            consume_materials(target_level)
             st.session_state.level = 0
             message = "강화 실패! 아이템이 파괴되어 +0으로 돌아갔습니다."
 
